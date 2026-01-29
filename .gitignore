@@ -1,3 +1,5 @@
 test.py
 venv/
 __pycache__/
+dist
+itd_sdk.egg-info

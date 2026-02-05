@@ -1,7 +1,7 @@
 from itd.request import fetch
 
-def get_notifications(token: str, limit: int = 20, cursor: int = 0, type: str | None = None):
-    data = {'limit': str(limit), 'cursor': str(cursor)}
+def get_notifications(token: str, limit: int = 20, offset: int = 0, type: str | None = None):
+    data = {'limit': str(limit), 'cursor': str(offset)}
     if type:
         data['type'] = type
     return fetch(token, 'get', 'notifications', data)

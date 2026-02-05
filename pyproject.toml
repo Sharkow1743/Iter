@@ -3,12 +3,13 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "itd-sdk"
+name = "iter-api"
 version = "0.3.0"
 description = "ITD client for python"
 readme = "README.md"
 authors = [
-  { name = "firedotguy", email = "nta16022013@gmail.com" }
+  { name = "firedotguy", email = "nta16022013@gmail.com" },
+  { name = "sharkow" }
 ]
 license = "MIT"
 dependencies = [

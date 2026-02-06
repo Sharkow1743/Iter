@@ -7,7 +7,7 @@ from iter.routes.users import get_user, update_profile, follow, unfollow, get_fo
 from iter.routes.etc import get_top_clans, get_who_to_follow, get_platform_status
 from iter.routes.comments import get_comments, add_comment, delete_comment, like_comment, unlike_comment
 from iter.routes.hashtags import get_hastags, get_posts_by_hastag
-from iter.routes.notifications import get_notifications, mark_as_read, mark_all_as_read, get_unread_notifications_count
+from iter.routes.notifications import get_notifications, mark_as_read, get_unread_notifications_count
 from iter.routes.posts import create_post, get_posts, get_post, edit_post, delete_post, pin_post, repost, view_post, get_liked_posts
 from iter.routes.reports import report
 from iter.routes.search import search
@@ -142,13 +142,13 @@ class Client:
         return get_hastags(self.token, limit)
 
     @refresh_on_error
-    def get_posts_by_hashtag(self, hashtag: str, limit: int = 20, cursor: int = 0):
-        return get_posts_by_hastag(self.token, hashtag, limit, cursor)
+    def get_posts_by_hashtag(self, hashtag: str, limit: int = 20, offset: int = 0):
+        return get_posts_by_hastag(self.token, hashtag, limit, offset)
 
 
     @refresh_on_error
-    def get_notifications(self, limit: int = 20, cursor: int = 0, type: str | None = None):
-        return get_notifications(self.token, limit, cursor, type)
+    def get_notifications(self, limit: int = 20, offset: int = 0, type: str | None = None):
+        return get_notifications(self.token, limit, offset, type)
 
     @refresh_on_error
     def mark_as_read(self, id: str):
@@ -223,11 +223,11 @@ class Client:
 
     @refresh_on_error
     def search_user(self, query: str, limit: int = 5):
-        return search(self.token, query, limit, 0)
+        return search(self.token, query, limit, 1)
 
     @refresh_on_error
     def search_hashtag(self, query: str, limit: int = 5):
-        return search(self.token, query, 0, limit)
+        return search(self.token, query, 1, limit)
 
 
     @refresh_on_error

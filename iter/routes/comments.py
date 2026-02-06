@@ -1,11 +1,16 @@
 from iter.request import fetch
+from typing import Optional
 
-def add_comment(token: str, post_id: str, content: str, attachment_ids: list[str] = []):
-    data = {'content': content, "attachmentIds": attachment_ids}
+def add_comment(token: str, post_id: str, content: str, attachment_ids: Optional[list[str]] = None):
+    data = {'content': content}
+    if attachment_ids:
+        data['attachmentIds'] = attachment_ids
     return fetch(token, 'post', f'posts/{post_id}/comments', data)
 
-def reply_to_comment(token: str, comment_id: str, content: str, attachment_ids: list[str] = []):
-    data = {'content': content, "attachmentIds": attachment_ids}
+def reply_to_comment(token: str, comment_id: str, content: str, attachment_ids: Optional[list[str]]  = None):
+    data = {'content': content}
+    if attachment_ids:
+        data['attachmentIds'] = attachment_ids
     return fetch(token, 'post', f'comments/{comment_id}/replies', data)
 
 def get_comments(token: str, post_id: str, limit: int = 20, cursor: int = 0, sort: str = 'popular'):

@@ -2,4 +2,6 @@ test.py
 venv/
 __pycache__/
 dist
-itd_sdk.egg-info
+iter.egg-info
+api_dump.json
+temp.py

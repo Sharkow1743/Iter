@@ -1,11 +1,13 @@
 from _io import BufferedReader
 
 from requests import Session
+from typing import Optional
+from pydantic import BaseModel
 
 s = Session()
 
 
-def fetch(token: str, method: str, url: str, params: dict = {}, files: dict[str, tuple[str, BufferedReader]] = {}):
+def fetch(token: str, method: str, url: str, params: dict = {}, files: dict[str, tuple[str, BufferedReader]] = {}, response_schema: Optional[BaseModel] = None):
     base = f'https://xn--d1ah4a.com/api/{url}'
     headers = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -30,7 +32,11 @@ def fetch(token: str, method: str, url: str, params: dict = {}, files: dict[str,
         res = s.request(method.upper(), base, timeout=20, json=params, headers=headers, files=files)
 
     res.raise_for_status()
-    return res.json()
+
+    if res and res.ok and response_schema:
+        return response_schema.model_validate(res.json())
+
+    return res
 
 def set_cookies(cookies: str):
     for cookie in cookies.split('; '):

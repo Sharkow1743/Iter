@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class Attachment(BaseModel):
     id: str
-    type: str  # "image" or "video"
+    type: Optional[str] = None  # "image" or "video"
     url: str
     thumbnailUrl: Optional[str] = None
     width: Optional[int] = None

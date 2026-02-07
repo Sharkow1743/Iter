@@ -1,9 +1,21 @@
 from __future__ import annotations
-from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Annotated
 from pydantic import BaseModel
-from .user import User
-from .media import Attachment
+from iter.types.user import User
+from iter.types.media import Attachment
+from pydantic import BeforeValidator
+from datetime import datetime
+
+def validate_datetime(v):
+    if isinstance(v, str):
+        # Fix +03 -> +03:00
+        if "+" in v:
+            parts = v.split("+")
+            if len(parts[-1]) <= 2:
+                v = f"{parts[0]}+{parts[-1].zfill(2)}:00"
+        return v
+    return v
+PostgresDateTime = Annotated[datetime, BeforeValidator(validate_datetime)]
 
 class Comment(BaseModel):
     id: str
@@ -12,7 +24,7 @@ class Comment(BaseModel):
     likesCount: int = 0
     repliesCount: int = 0
     isLiked: bool = False
-    createdAt: datetime
+    createdAt: PostgresDateTime
     attachments: List[Attachment] = []
     replies: List[Comment] = []
 
@@ -25,7 +37,7 @@ class Post(BaseModel):
     commentsCount: int = 0
     repostsCount: int = 0
     viewsCount: int = 0
-    createdAt: datetime
+    createdAt: PostgresDateTime
     isLiked: bool = False
     isReposted: bool = False
     isOwner: bool = False

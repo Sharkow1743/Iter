@@ -1,5 +1,4 @@
-from typing import Optional, Annotated
-from datetime import datetime
+from typing import Optional, Literal
 from iter.types.base import IterBaseModel, PostgresDateTime
 
 class NotificationActor(IterBaseModel):
@@ -10,7 +9,7 @@ class NotificationActor(IterBaseModel):
 
 class Notification(IterBaseModel):
     id: str
-    type: str # "like", "comment", "follow", "repost"
+    type: Literal["like", "comment", "follow", "repost", "wall_post"]
     targetType: Optional[str] = None
     targetId: Optional[str] = None
     preview: Optional[str] = None

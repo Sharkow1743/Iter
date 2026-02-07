@@ -5,3 +5,5 @@ dist
 iter.egg-info
 api_dump.json
 temp.py
+session.json
+browser

@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "iter-api"
+name = "itd-iter-api"
 version = "0.3.0"
 description = "ITD client for python"
 readme = "README.md"

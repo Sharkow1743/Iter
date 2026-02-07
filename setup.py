@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 version = '1.0.0'
 
 setup(
-    name='iter-api',
+    name='itd-iter-api',
     version=version,
     packages=find_packages(),
     install_requires=[

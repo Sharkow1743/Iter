@@ -23,8 +23,9 @@ jobs:
           RELEASE_VERSION="${{ github.event.release.tag_name }}"
           
           sed -i "s/^version\s*=\s*['\"][^'\"]*['\"]/version = '$RELEASE_VERSION'/" setup.py
+          sed -i "s/^version\s*=\s*['\"][^'\"]*['\"]/version = '$RELEASE_VERSION'/" pyproject.toml
           
-          echo "Updated version in setup.py to:"
+          echo "Updated version in setup.py and pyproject.toml to:"
           grep "^version\s*=" setup.py
 
       - name: Install build tools

@@ -1,5 +1,5 @@
 from typing import Optional
-from iter.types.base import IterBaseModel
+from iter.models.base import IterBaseModel
 
 class Hashtag(IterBaseModel):
     id: str

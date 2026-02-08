@@ -1,6 +1,6 @@
 from iter.request import fetch
-from iter.types.user import UserFull
-from iter.types.responses import ProfileUpdateResponse, PrivacyUpdateResponse, FollowResponse, UserListResponse
+from iter.models.user import UserFull
+from iter.models.responses import ProfileUpdateResponse, PrivacyUpdateResponse, FollowResponse, UserListResponse
 
 
 def get_user(token: str, username: str) -> UserFull:

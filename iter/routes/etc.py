@@ -1,5 +1,5 @@
 from iter.request import fetch
-from iter.types.responses import ClanListResponse, WhoToFollowResponse, PlatformStatusResponse
+from iter.models.responses import ClanListResponse, WhoToFollowResponse, PlatformStatusResponse
 
 def get_top_clans(token: str) -> ClanListResponse:
     return fetch(token, 'get', 'users/stats/top-clans', response_schema=ClanListResponse)

@@ -1,6 +1,6 @@
 from iter.request import fetch
-from iter.types.post import Post
-from iter.types.responses import PostFeedResponse, Post, PostUpdateResponse, PinResponse
+from iter.models.post import Post
+from iter.models.responses import PostFeedResponse, Post, PostUpdateResponse, PinResponse
 
 def create_post(token: str, content: str, wall_recipient_id: int | None = None, attach_ids: list[str] = []) -> Post:
     data: dict = {'content': content}

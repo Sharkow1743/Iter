@@ -1,7 +1,7 @@
 from iter.request import fetch
 from typing import Optional
-from iter.types.post import Comment
-from iter.types.responses import CommentsResponse, LikeResponse
+from iter.models.post import Comment
+from iter.models.responses import CommentsResponse, LikeResponse
 
 def add_comment(token: str, post_id: str, content: str, attachment_ids: Optional[list[str]] = None) -> Comment:
     data = {'content': content}

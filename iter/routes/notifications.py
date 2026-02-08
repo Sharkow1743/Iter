@@ -1,5 +1,5 @@
 from iter.request import fetch
-from iter.types.responses import NotificationListResponse, NotificationCountResponse, StatusResponse
+from iter.models.responses import NotificationListResponse, NotificationCountResponse, StatusResponse
 
 def get_notifications(token: str, limit: int = 20, offset: int = 0, type: str | None = None) -> NotificationListResponse:
     data = {'limit': str(limit), 'cursor': str(offset)}

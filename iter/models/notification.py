@@ -1,5 +1,5 @@
 from typing import Optional, Literal
-from iter.types.base import IterBaseModel, PostgresDateTime
+from iter.models.base import IterBaseModel, PostgresDateTime
 
 class NotificationActor(IterBaseModel):
     id: str

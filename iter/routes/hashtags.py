@@ -1,5 +1,5 @@
 from iter.request import fetch
-from iter.types.responses import SearchResponse, HashtagFeedResponse
+from iter.models.responses import SearchResponse, HashtagFeedResponse
 
 def get_hastags(token: str, limit: int = 10) -> SearchResponse:
     return fetch(token, 'get', 'hashtags/trending', {'limit': limit}, response_schema=SearchResponse)

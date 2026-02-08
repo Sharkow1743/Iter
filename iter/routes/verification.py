@@ -1,5 +1,5 @@
 from iter.request import fetch
-from iter.types.responses import VerificateResponse, VerificationStatusResponse
+from iter.models.responses import VerificateResponse, VerificationStatusResponse
 
 
 def verificate(token: str, file_url: str) -> VerificateResponse:

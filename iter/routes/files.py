@@ -1,7 +1,7 @@
 from _io import BufferedReader
 
 from iter.request import fetch
-from iter.types.media import Attachment
+from iter.models.media import Attachment
 
 
 def upload_file(token: str, name: str, data: BufferedReader) -> Attachment:

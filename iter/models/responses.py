@@ -1,8 +1,8 @@
-from iter.types.user import User, Clan
-from iter.types.etc import Hashtag, CursorPagination, PagePagination
-from iter.types.post import Post, Comment
-from iter.types.notification import Notification
-from iter.types.base import IterBaseModel, PostgresDateTime
+from iter.models.user import User, Clan
+from iter.models.etc import Hashtag, CursorPagination, PagePagination
+from iter.models.post import Post, Comment
+from iter.models.notification import Notification
+from iter.models.base import IterBaseModel, PostgresDateTime
 from typing import List, Optional
 from pydantic import Field
 

@@ -1,12 +1,14 @@
 from iter.request import fetch
 from iter.models.user import UserFull
 from iter.models.responses import ProfileUpdateResponse, PrivacyUpdateResponse, FollowResponse, UserListResponse
+from iter.models.base import Error
+from uuid import UUID
 
 
-def get_user(token: str, username: str) -> UserFull:
+def get_user(token: str, username: str) -> UserFull | Error:
     return fetch(token, 'get', f'users/{username}', response_schema=UserFull)
 
-def update_profile(token: str, bio: str | None = None, display_name: str | None = None, username: str | None = None, banner_id: str | None = None) -> ProfileUpdateResponse:
+def update_profile(token: str, bio: str | None = None, display_name: str | None = None, username: str | None = None, banner_id: UUID | None = None) -> ProfileUpdateResponse:
     data = {}
     if bio:
         data['bio'] = bio
@@ -18,7 +20,7 @@ def update_profile(token: str, bio: str | None = None, display_name: str | None 
         data['bannerId'] = banner_id
     return fetch(token, 'put', 'users/me', data, response_schema=ProfileUpdateResponse)
 
-def update_privacy(token: str, wall_closed: bool = False, private: bool = False) -> PrivacyUpdateResponse:
+def update_privacy(token: str, wall_closed: bool = False, private: bool = False) -> PrivacyUpdateResponse | Error:
     data = {}
     if wall_closed:
         data['wallClosed'] = wall_closed
@@ -26,15 +28,15 @@ def update_privacy(token: str, wall_closed: bool = False, private: bool = False)
         data['isPrivate'] = private
     return fetch(token, 'put', 'users/me/privacy', data, response_schema=PrivacyUpdateResponse)
 
-def follow(token: str, username: str) -> FollowResponse:
+def follow(token: str, username: str) -> FollowResponse | Error:
     return fetch(token, 'post', f'users/{username}/follow', response_schema=FollowResponse)
 
-def unfollow(token: str, username: str) -> FollowResponse:
+def unfollow(token: str, username: str) -> FollowResponse | Error:
     return fetch(token, 'delete', f'users/{username}/follow', response_schema=FollowResponse)
 
-def get_followers(token: str, username: str, limit: int = 30, page: int = 1) -> UserListResponse:
+def get_followers(token: str, username: str, limit: int = 30, page: int = 1) -> UserListResponse | Error:
     return fetch(token, 'get', f'users/{username}/followers', {'limit': limit, 'page': page}, response_schema=UserListResponse)
 
-def get_following(token: str, username: str, limit: int = 30, page: int = 1) -> UserListResponse:
+def get_following(token: str, username: str, limit: int = 30, page: int = 1) -> UserListResponse | Error:
     return fetch(token, 'get', f'users/{username}/following', {'limit': limit, 'page': page}, response_schema=UserListResponse)
 

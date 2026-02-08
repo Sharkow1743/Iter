@@ -1,8 +1,9 @@
 from typing import Optional
 from iter.models.base import IterBaseModel
+from uuid import UUID
 
 class Hashtag(IterBaseModel):
-    id: str
+    id: UUID
     name: str
     postsCount: int
 
@@ -16,3 +17,10 @@ class PagePagination(IterBaseModel):
     limit: int
     total: int
     hasMore: bool
+
+class Pagination(IterBaseModel):
+    page: int | None = 1
+    limit: int = 20
+    total: int | None = None
+    has_more: bool = True
+    next_cursor: UUID | None = None

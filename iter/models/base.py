@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import Annotated, Any
-from pydantic import BaseModel, ConfigDict, BeforeValidator, model_validator
+from typing import Annotated, Any, cast, Optional
+from pydantic import BaseModel, ConfigDict, BeforeValidator, model_validator, computed_field
 from pydantic.alias_generators import to_camel
 
 def validate_datetime(v: Any):
@@ -24,10 +24,12 @@ class IterBaseModel(BaseModel):
         first_key = next(iter(data))
         first_value = data[first_key]
 
-        if not first_key in ['data', 'error']: return data
+        if first_key not in ['data', 'error']: return data
 
         return first_value
 
 class Error(IterBaseModel):
     code: str
     message: str
+    retry_after: Optional[int] = None
+    found: Optional[dict] = None

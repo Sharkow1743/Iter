@@ -22,6 +22,10 @@ class InvalidCookie(Exception):
 class InvalidToken(Exception):
     def __str__(self):
         return 'Invalid access token'
+    
+class InvalidRefreshToken(Exception):
+    def __str__(self):
+        return 'Invalid refresh token'
 
 class SamePassword(Exception):
     def __str__(self):
@@ -99,3 +103,7 @@ class PinNotOwned(Exception):
         self.pin = pin
     def __str__(self):
         return f'You do not own "{self.pin}" pin'
+    
+class NoContent(Exception):
+    def __str__(self) -> str:
+        return 'Content or attachments required'

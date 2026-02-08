@@ -1,11 +1,12 @@
 from __future__ import annotations
 from typing import List, Optional
+from uuid import UUID
 from .base import IterBaseModel, PostgresDateTime
 from .user import User
 from .media import Attachment
 
 class Comment(IterBaseModel):
-    id: str
+    id: UUID
     content: str
     author: User
     likes_count: int = 0
@@ -16,7 +17,7 @@ class Comment(IterBaseModel):
     replies: List[Comment] = []
 
 class Post(IterBaseModel):
-    id: str
+    id: UUID
     content: str
     author: User
     attachments: List[Attachment] = []

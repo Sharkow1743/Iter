@@ -1,8 +1,9 @@
 from typing import Optional
 from iter.models.base import IterBaseModel
+from uuid import UUID
 
 class Attachment(IterBaseModel):
-    id: str
+    id: UUID
     type: Optional[str] = None  # "image" or "video"
     url: str
     thumbnailUrl: Optional[str] = None

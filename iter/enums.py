@@ -1,21 +1,4 @@
-ERROR_CODE_TO_EXCEPTION = {
-    'SAME_PASSWORD': SamePassword,
-    'INVALID_OLD_PASSWORD': InvalidOldPassword,
-    'NOT_FOUND': NotFound,
-    'USER_BLOCKED': UserBanned,
-    'USERNAME_TAKEN': UsernameTaken,
-    'VALIDATION_ERROR': ValidationError,
-    'PENDING_REQUEST_EXISTS': PendingRequestExists,
-    'FORBIDDEN': Forbidden,
-    'PIN_NOT_OWNED': PinNotOwned
-}
-
 from enum import Enum
-from iter.exceptions import (
-    NoCookie, NoAuthData, SamePassword, InvalidOldPassword, NotFound, ValidationError, UserBanned,
-    PendingRequestExists, Forbidden, UsernameTaken, CantFollowYourself, Unauthorized,
-    CantRepostYourPost, AlreadyReposted, AlreadyReported, TooLarge, PinNotOwned
-)
 
 class NotificationType(Enum):
     WALL_POST = 'wall_post'

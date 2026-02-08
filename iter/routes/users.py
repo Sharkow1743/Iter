@@ -17,7 +17,7 @@ def update_profile(token: str, bio: str | None = None, display_name: str | None 
     if username:
         data['username'] = username
     if banner_id:
-        data['bannerId'] = banner_id
+        data['bannerId'] = str(banner_id)
     return fetch(token, 'put', 'users/me', data, response_schema=ProfileUpdateResponse)
 
 def update_privacy(token: str, wall_closed: bool = False, private: bool = False) -> PrivacyUpdateResponse | Error:

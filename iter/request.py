@@ -12,8 +12,8 @@ from iter.models.base import Error
 logger = verboselogs.VerboseLogger(__name__)
 s = Session()
 
-def dump_res(res: Response):
-    return f'Request dump:\n> {res.request.method} {res.request.url}\n> {str(res.request.body) if len(str(res.request.body)) < 1000 else str(res.request.body)[:1000] + '...'}\n> {res.reason} {res.status_code} {res.text if len(res.text) < 1000 else res.text[:1000] + '...'}\n> {res.api_err.code + ': ' + res.api_err.message if res.api_err else ''}'
+def dump_res(res: Response, err: Error | None = None):
+    return f'Request dump:\n> {res.request.method} {res.request.url}\n> {str(res.request.body) if len(str(res.request.body)) < 1000 else str(res.request.body)[:1000] + '...'}\n> {res.reason} {res.status_code} {res.text if len(res.text) < 1000 else res.text[:1000] + '...'}\n> {err.code + ': ' + err.message if err else ''}'
 def dump_req(req: PreparedRequest):
     body = str(req.body) if req.body is not None else ""
     return (
@@ -52,6 +52,7 @@ def fetch(
     )
 
     prepared = s.prepare_request(request)
+    error_obj = None
 
     response = None
 
@@ -94,7 +95,7 @@ def fetch(
         raise
     finally:
         dump = dump_req(prepared)
-        if response: dump = dump_res(response)
+        if response: dump = dump_res(response, error_obj)
         logger.debug(dump)
 
 
@@ -138,6 +139,7 @@ def auth_fetch(cookies: str | list, method: str, url: str, params: dict = {}, to
         json=params if method.upper() != "GET" else None
     )
     res = None
+    err = None
 
     prepared = s.prepare_request(req)
 
@@ -146,6 +148,10 @@ def auth_fetch(cookies: str | list, method: str, url: str, params: dict = {}, to
             prepared, 
             timeout=20
         )
+
+        # 204 No Content has no body, so we return immediately
+        if res.status_code == 204:
+            return None
 
         if res.text == 'UNAUTHORIZED':
             raise InvalidToken()
@@ -167,7 +173,6 @@ def auth_fetch(cookies: str | list, method: str, url: str, params: dict = {}, to
         raise
     finally:
         dump = dump_req(prepared)
-        if res:
-            dump = dump_res(res)
+        if res: dump = dump_res(res, err)
 
         logger.debug(dump)

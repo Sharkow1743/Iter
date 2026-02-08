@@ -1,6 +1,7 @@
+from iter.models.base import Error
 from iter.request import fetch
-from iter.models.responses import ReportResponse
+from iter.models.reports import NewReport
 from uuid import UUID
 
-def report(token: str, id: UUID, type: str = 'post', reason: str = 'other', description: str = '') -> ReportResponse:
-    return fetch(token, 'post', 'reports', {'targetId': id, 'targetType': type, 'reason': reason, 'description': description}, response_schema=ReportResponse)
+def report(token: str, id: UUID, type: str = 'post', reason: str = 'other', description: str = '') -> NewReport | Error:
+    return fetch(token, 'post', 'reports', {'targetId': str(id), 'targetType': type, 'reason': reason, 'description': description}, response_schema=NewReport)

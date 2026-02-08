@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import Optional
-from .base import IterBaseModel, PostgresDateTime
+from uuid import UUID
+from iter.models.base import IterBaseModel, PostgresDateTime
+from iter.models.pin import ShortPin
 
 class User(IterBaseModel):
     id: Optional[str] = None
@@ -13,8 +15,8 @@ class User(IterBaseModel):
 class UserFull(User):
     banner: Optional[str] = None
     bio: Optional[str] = None
-    pin: Optional[str] = None
-    pinned_post_id: Optional[str] = None
+    pin: Optional[ShortPin] = None
+    pinned_post_id: Optional[UUID] = None
     is_private: Optional[bool] = None
     wall_closed: Optional[bool] = None
     following_count: int = 0

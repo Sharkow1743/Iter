@@ -37,15 +37,6 @@ class PostUpdateResponse(IterBaseModel):
     content: str
     updated_at: PostgresDateTime
 
-class ReportResponse(IterBaseModel):
-    pass # TODO
-
-class VerificateResponse(IterBaseModel):
-    pass # TODO
-
-class VerificationStatusResponse(IterBaseModel):
-    pass # TODO
-
 class LikeResponse(IterBaseModel):
     liked: bool
     likes_count: int
@@ -94,7 +85,7 @@ class RepliesResponse(IterBaseModel):
 
 class PinsListResponse(IterBaseModel):
     pins: list[Pin]
-    actve_pin: str
+    activePin: Optional[str]
 
 class SetPinResponse(IterBaseModel):
     pin: ShortPin

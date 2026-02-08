@@ -6,12 +6,12 @@ from requests import Response
 from iter.models.base import Error
 from uuid import UUID
 
-def create_post(token: str, content: str, wall_recipient_id: int | None = None, attach_ids: list[str] = []) -> Post | Error:
+def create_post(token: str, content: str, wall_recipient_id: UUID | None = None, attachment_ids: list[str] = []) -> Post | Error:
     data: dict = {'content': content}
     if wall_recipient_id:
-        data['wallRecipientId'] = wall_recipient_id
-    if attach_ids:
-        data['attachmentIds'] = attach_ids
+        data['wallRecipientId'] = str(wall_recipient_id)
+    if attachment_ids:
+        data['attachmentIds'] = list(map(str, attachment_ids))
 
     return fetch(token, 'post', 'posts', data, response_schema=Post)
 

@@ -160,7 +160,7 @@ class Client:
 
         res = logout(self.cookies)
 
-        return res.json()
+        return res
     
     @refresh_on_error
     def change_password(self, old: str, new: str) -> dict:
@@ -459,7 +459,7 @@ class Client:
         return res
 
     @refresh_on_error
-    def add_reply_comment(self, comment_id: UUID, content: str, author_id: UUID, attachment_ids: list[UUID] = []):
+    def add_reply_comment(self, comment_id: UUID, content: str, author_id: UUID | None = None, attachment_ids: list[UUID] = []):
         """Add reply comment
 
         Args:
@@ -710,7 +710,7 @@ class Client:
             list[Post]: List of posts
             Pagination: Pagination
         """
-        res = get_posts(self.token, cursor, tab)
+        res = get_posts(self.token, cursor=cursor, tab=tab.value)
 
         return res
 
@@ -910,7 +910,7 @@ class Client:
         Returns:
             NewReport: New report
         """
-        res = report(self.token, id, type, reason, description)
+        res = report(self.token, id, type.value, reason.value, description)
         if isinstance(res, Error):
             match res.code:
                 case 'VALIDATION_ERROR':
@@ -961,7 +961,7 @@ class Client:
         Returns:
             list[UserWhoToFollow]: List of users
         """
-        return self.search(query, limit, 0)[0]
+        return self.search(query, limit, 1)
 
     @refresh_on_error
     def search_hashtag(self, query: str, limit: int = 5):
@@ -974,7 +974,7 @@ class Client:
         Returns:
             list[Hashtag]: List of hashtags
         """
-        return self.search(query, 0, limit)[1]
+        return self.search(query, 1, limit)
 
     @refresh_on_error
     def upload_file(self, name: str, data: BufferedReader):

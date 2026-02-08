@@ -1,19 +1,17 @@
 from uuid import UUID
-from datetime import datetime
-
-from pydantic import BaseModel, Field
 
 from iter.enums import ReportTargetType, ReportTargetReason
+from iter.models.base import IterBaseModel, PostgresDateTime
 
 
-class NewReport(BaseModel):
+class NewReport(IterBaseModel):
     id: UUID
-    created_at: datetime = Field(alias='createdAt')
+    created_at: PostgresDateTime
 
 
 class Report(NewReport):
     reason: ReportTargetReason
     description: str | None = None
 
-    target_type: ReportTargetType = Field(alias='targetType')
+    target_type: ReportTargetType
     target_id: UUID

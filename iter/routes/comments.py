@@ -12,10 +12,12 @@ def add_comment(token: str, post_id: UUID, content: str, attachment_ids: Optiona
         data['attachmentIds'] = attachment_ids
     return fetch(token, 'post', f'posts/{post_id}/comments', data, response_schema=Comment)
 
-def add_reply_comment(token: str, comment_id: UUID, content: str, attachment_ids: Optional[list[str]]  = None) -> Comment | Error:
+def add_reply_comment(token: str, comment_id: UUID, content: str, author_id: UUID | None = None, attachment_ids: Optional[list[str]]  = None) -> Comment | Error:
     data = {'content': content}
     if attachment_ids:
         data['attachmentIds'] = attachment_ids
+    if author_id:
+        data['replyToUserId'] = author_id
     return fetch(token, 'post', f'comments/{comment_id}/replies', data, response_schema=Comment)
 
 def get_comments(token: str, post_id: UUID, limit: int = 20, cursor: int = 0, sort: str = 'popular') -> CommentsResponse | Error:

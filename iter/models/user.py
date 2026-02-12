@@ -24,6 +24,8 @@ class UserFull(User):
     created_at: PostgresDateTime
     is_following: Optional[bool] = None
     is_followed_by: Optional[bool] = None
+    online: bool
+    lastSeen: Optional[PostgresDateTime] = None
 
 class Clan(IterBaseModel):
     avatar: str

@@ -3,6 +3,7 @@ from requests import Response
 import logging, verboselogs
 from uuid import UUID
 
+from Iter.iter.routes.polls import vote
 from iter.routes.pins import get_pins, remove_pin, set_pin
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -182,13 +183,14 @@ class Client:
             raise NoCookie()
 
         res = change_password(self.cookies, self.token, old, new)
-        match res.api_err.code:
-            case 'SAME_PASSWORD':
-                raise SamePassword()
-            case 'INVALID_OLD_PASSWORD':
-                raise InvalidOldPassword()
+        if isinstance(res, Error):
+            match res.code:
+                case 'SAME_PASSWORD':
+                    raise SamePassword()
+                case 'INVALID_OLD_PASSWORD':
+                    raise InvalidOldPassword()
 
-        return res.json()
+        return res
 
 
 # --- API methods ---
@@ -203,9 +205,6 @@ class Client:
         Raises:
             NotFound: User not found
             UserBanned: User banned
-
-        Returns:
-            User: User
         """
         user = get_user(self.token, username)
         if isinstance(user, Error):
@@ -220,9 +219,6 @@ class Client:
     @refresh_on_error
     def get_me(self):
         """Get current user (me)
-
-        Returns:
-            User: User
         """
         return self.get_user('me')
 
@@ -239,9 +235,6 @@ class Client:
         Raises:
             ValidationError: Validation error
             UsernameTaken: Username is already taken
-
-        Returns:
-            UserProfileUpdate: Updated profile
         """
         res = update_profile(self.token, bio, display_name, username, banner_id)
         if isinstance(res, Error):
@@ -262,9 +255,6 @@ class Client:
         Args:
             wall_closed (bool, optional): Close wall. Defaults to False.
             private (bool, optional): Privacy. Functionality currently unknown. Defaults to False.
-
-        Returns:
-            UserPrivacy: Updated privacy data
         """
         res = update_privacy(self.token, wall_closed, private)
         if isinstance(res, Error):
@@ -282,9 +272,6 @@ class Client:
         Raises:
             NotFound: User not found
             CantFollowYourself: Cannot follow yourself
-
-        Returns:
-            int: Follower count after following
         """
         res = follow(self.token, username)
         if isinstance(res, Error):
@@ -305,9 +292,6 @@ class Client:
 
         Raises:
             NotFound: User not found
-
-        Returns:
-            int: Follower count after unfollowing
         """
         res = unfollow(self.token, username)
         if isinstance(res, Error):
@@ -328,10 +312,6 @@ class Client:
 
         Raises:
             NotFound: User not found
-
-        Returns:
-            list[UserFollower]: List of followers
-            Pagination: Pagination data (limit, page, total, has more)
         """
         res = get_followers(self.token, username, limit, page)
         if isinstance(res, Error):
@@ -352,10 +332,6 @@ class Client:
 
         Raises:
             NotFound: User not found
-
-        Returns:
-            list[UserFollower]: List of followings
-            Pagination: Pagination data (limit, page, total, has more)
         """
         res = get_following(self.token, username, limit, page)
         if isinstance(res, Error):
@@ -374,9 +350,6 @@ class Client:
 
         Raises:
             PendingRequestExists: Request already pending
-
-        Returns:
-            Verification: Verification
         """
         res = verify(self.token, file_url)
         if isinstance(res, Error):
@@ -389,9 +362,6 @@ class Client:
     @refresh_on_error
     def get_verification_status(self):
         """Get verification status
-
-        Returns:
-            VerificationStatus: Verification status
         """
         res = get_verification_status(self.token)
 
@@ -400,9 +370,6 @@ class Client:
     @refresh_on_error
     def get_who_to_follow(self):
         """Get list of popular users (who to follow)
-
-        Returns:
-            list[UserWhoToFollow]: List of users
         """
         res = get_who_to_follow(self.token)          
 
@@ -411,9 +378,6 @@ class Client:
     @refresh_on_error
     def get_top_clans(self):
         """Get top clans
-
-        Returns:
-            list[Clan]: Top clans
         """
         res = get_top_clans(self.token)
 
@@ -422,9 +386,6 @@ class Client:
     @refresh_on_error
     def get_platform_status(self):
         """Get platform status
-
-        Returns:
-            bool: read only
         """
         res = get_platform_status(self.token)
 
@@ -443,9 +404,6 @@ class Client:
         Raises:
             ValidationError: Validation error
             NotFound: Post not found
-
-        Returns:
-            Comment: Comment
         """
         res = add_comment(self.token, post_id, content, attachment_ids)
         if isinstance(res, Error):
@@ -472,9 +430,6 @@ class Client:
             ValidationError: Validation error
             NotFound: User or Comment not found
             NoContent: Validation error resulting in no content
-
-        Returns:
-            Comment: Comment
         """
         res = add_reply_comment(self.token, comment_id, content, author_id, attachment_ids)
         if isinstance(res, Error):
@@ -502,10 +457,6 @@ class Client:
 
         Raises:
             NotFound: Post not found
-
-        Returns:
-            list[Comment]: List of comments
-            Pagination: Pagination
         """
         res = get_comments(self.token, post_id, limit, cursor, sort)
         if ((isinstance(res, Error) and res.code == 'NOT_FOUND')
@@ -525,10 +476,6 @@ class Client:
 
         Raises:
             NotFound: Comment not found
-
-        Returns:
-            list[Comment]: List of replies
-            Pagination: Pagination
         """
         res = get_replies(self.token, comment_id, page, limit, sort)
         if ((isinstance(res, Error) and res.code == 'NOT_FOUND')
@@ -545,9 +492,6 @@ class Client:
 
         Raises:
             NotFound: Comment not found
-
-        Returns:
-            int: Number of likes
         """
         res = like_comment(self.token, id)
         if ((isinstance(res, Error) and res.code == 'NOT_FOUND')
@@ -564,9 +508,6 @@ class Client:
 
         Raises:
             NotFound: Comment not found
-
-        Returns:
-            int: Number of likes
         """
         res = unlike_comment(self.token, id)
         if ((isinstance(res, Error) and res.code == 'NOT_FOUND')
@@ -600,9 +541,6 @@ class Client:
 
         Args:
             limit (int, optional): Limit. Defaults to 10.
-
-        Returns:
-            list[Hashtag]: List of hashtags
         """
         res = get_hashtags(self.token, limit)
 
@@ -616,11 +554,6 @@ class Client:
             hashtag (str): Hashtag (without #)
             limit (int, optional): Limit. Defaults to 20.
             cursor (UUID | None, optional): Cursor (UUID of the last post to fetch data after). Defaults to None.
-
-        Returns:
-            Hashtag | None: Hashtag
-            list[Post]: Posts
-            Pagination: Pagination
         """
         res = get_posts_by_hashtag(self.token, hashtag, limit, cursor)
 
@@ -633,10 +566,6 @@ class Client:
         Args:
             limit (int, optional): Limit. Defaults to 20.
             offset (int, optional): Offset. Defaults to 0.
-
-        Returns:
-            list[Notification]: Notifications
-            Pagination: Pagination
         """
         res = get_notifications(self.token, limit, offset)
 
@@ -648,9 +577,6 @@ class Client:
 
         Args:
             id (UUID): Notification UUID
-
-        Returns:
-            bool: Success (False - already read)
         """
         res = mark_as_read(self.token, id)
         return res
@@ -663,9 +589,6 @@ class Client:
     @refresh_on_error
     def get_unread_notifications_count(self):
         """Get unread notifications count
-
-        Returns:
-            int: Count
         """
         res = get_unread_notifications_count(self.token)
 
@@ -683,9 +606,6 @@ class Client:
         Raises:
             NotFound: User not found
             ValidationError: Validation error
-
-        Returns:
-            NewPost: New post
         """
         res = create_post(self.token, content, wall_recipient_id, attach_ids)
         if isinstance(res, Error):
@@ -705,10 +625,6 @@ class Client:
         Args:
             cursor (int, optional): Page. Defaults to 0.
             tab (PostsTab, optional): Tab (popular or following). Defaults to PostsTab.POPULAR.
-
-        Returns:
-            list[Post]: List of posts
-            Pagination: Pagination
         """
         res = get_posts(self.token, cursor=cursor, tab=tab.value)
 
@@ -723,9 +639,6 @@ class Client:
 
         Raises:
             NotFound: Post not found
-
-        Returns:
-            Post: Post
         """
         res = get_post(self.token, id)
         if isinstance(res, Error):
@@ -747,9 +660,6 @@ class Client:
             NotFound: Post not found
             Forbidden: No access
             ValidationError: Validation error
-
-        Returns:
-            str: New content
         """
         res = edit_post(self.token, id, content)
         if isinstance(res, Error):
@@ -815,9 +725,6 @@ class Client:
             AlreadyReposted: Post already reposted
             CantRepostYourPost: Cannot repost your own post
             ValidationError: Validation error
-
-        Returns:
-            NewPost: New post
         """
         res = repost(self.token, id, content)
         if isinstance(res, Error):
@@ -859,10 +766,6 @@ class Client:
 
         Raises:
             NotFound: User not found
-
-        Returns:
-            list[Post]: List of posts
-            LikedPostsPagintaion: Pagination
         """
         res = get_user_posts(self.token, username_or_id, limit, cursor)
         if ((isinstance(res, Error) and res.code == 'NOT_FOUND')
@@ -881,10 +784,6 @@ class Client:
 
         Raises:
             NotFound: User not found
-
-        Returns:
-            list[Post]: List of posts
-            LikedPostsPagintaion: Pagination
         """
         res = get_liked_posts(self.token, username_or_id, limit, cursor)
         if ((isinstance(res, Error) and res.code == 'NOT_FOUND')
@@ -906,9 +805,6 @@ class Client:
             NotFound: Target not found
             AlreadyReported: Report already sent
             ValidationError: Validation error
-
-        Returns:
-            NewReport: New report
         """
         res = report(self.token, id, type.value, reason.value, description)
         if isinstance(res, Error):
@@ -937,10 +833,6 @@ class Client:
 
         Raises:
             TooLarge: Query too long
-
-        Returns:
-            list[UserWhoToFollow]: List of users
-            list[Hashtag]: List of hashtags
         """
         res = search(self.token, query, user_limit, hashtag_limit)
         if isinstance(res, Error):
@@ -957,9 +849,6 @@ class Client:
         Args:
             query (str): Query
             limit (int, optional): Limit. Defaults to 5.
-
-        Returns:
-            list[UserWhoToFollow]: List of users
         """
         return self.search(query, limit, 1)
 
@@ -970,9 +859,6 @@ class Client:
         Args:
             query (str): Query
             limit (int, optional): Limit. Defaults to 5.
-
-        Returns:
-            list[Hashtag]: List of hashtags
         """
         return self.search(query, 1, limit)
 
@@ -983,9 +869,6 @@ class Client:
         Args:
             name (str): Filename
             data (BufferedReader): Content (open('name', 'rb'))
-
-        Returns:
-            File: File
         """
         res = upload_file(self.token, name, data)
 
@@ -996,9 +879,6 @@ class Client:
 
         Args:
             name (str): Filename
-
-        Returns:
-            UserProfileUpdate: Updated profile
         """
         file_id = self.upload_file(name, cast(BufferedReader, open(name, 'rb'))).id
         return self.update_profile(banner_id=file_id)
@@ -1021,9 +901,6 @@ class Client:
 
         Raises:
             NotFound: Post not found
-
-        Returns:
-            int: Number of likes
         """
         res = like_post(self.token, post_id)
         if ((isinstance(res, Error) and res.code == 'NOT_FOUND')
@@ -1040,9 +917,6 @@ class Client:
 
         Raises:
             NotFound: Post not found
-
-        Returns:
-            int: Number of likes
         """
         res = unlike_post(self.token, post_id)
         if ((isinstance(res, Error) and res.code == 'NOT_FOUND')
@@ -1053,10 +927,6 @@ class Client:
     @refresh_on_error
     def get_pins(self):
         """Get list of pins
-
-        Returns:
-            list[Pin]: List of pins
-            str: Active pin
         """
         res = get_pins(self.token)
 
@@ -1088,3 +958,13 @@ class Client:
                     raise PinNotOwned(slug)
         
         return res
+    
+    @refresh_on_error
+    def vote(self, ids: list[UUID]):
+        """Vote for options in poll
+
+        Args:
+            ids (list[UUID]): UUIDs of options in poll
+        """
+
+        return vote(self.token, ids)

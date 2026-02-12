@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import List, Optional
 from uuid import UUID
-from .base import IterBaseModel, PostgresDateTime
-from .user import User
-from .media import Attachment
+from iter.models.base import IterBaseModel, PostgresDateTime
+from iter.models.user import User
+from iter.models.media import Attachment, Poll
 
 class Comment(IterBaseModel):
     id: UUID
@@ -34,6 +34,7 @@ class Post(IterBaseModel):
     wall_recipient: Optional[User] = None
     original_post: Optional[Post] = None
     comments: Optional[List[Comment]] = None
+    poll: Optional[Poll] = None
 
 Post.model_rebuild()
 Comment.model_rebuild()

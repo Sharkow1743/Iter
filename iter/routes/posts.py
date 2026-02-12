@@ -2,16 +2,19 @@ from datetime import datetime
 from iter.request import fetch
 from iter.models.post import Post
 from iter.models.responses import PostFeedResponse, Post, PostUpdateResponse, PinResponse
+from iter.models.media import NewPoll
 from requests import Response
 from iter.models.base import Error
 from uuid import UUID
 
-def create_post(token: str, content: str, wall_recipient_id: UUID | None = None, attachment_ids: list[str] = []) -> Post | Error:
+def create_post(token: str, content: str, wall_recipient_id: UUID | None = None, attachment_ids: list[str] = [], poll: NewPoll | None = None) -> Post | Error:
     data: dict = {'content': content}
     if wall_recipient_id:
         data['wallRecipientId'] = str(wall_recipient_id)
     if attachment_ids:
         data['attachmentIds'] = list(map(str, attachment_ids))
+    if poll:
+        data['poll'] = NewPoll.model_dump_json(poll)
 
     return fetch(token, 'post', 'posts', data, response_schema=Post)
 

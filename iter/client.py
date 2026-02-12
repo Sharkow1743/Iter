@@ -48,7 +48,7 @@ def refresh_on_error(func):
                 return func(self, *args, **kwargs)
             except (Unauthorized, ConnectionError, HTTPError):
                 logger.notice("Access token expired, attempting refresh")
-                self.auth()
+                self.refresh_auth()
                 return func(self, *args, **kwargs)
         else:
             return func(self, *args, **kwargs)

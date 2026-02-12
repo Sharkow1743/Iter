@@ -25,7 +25,7 @@ class Poll(IterBaseModel):
     post_id: UUID
     question: Optional[str] = None
     options: list[PollOption]
-    multiple_choise: bool
+    multiple_choice: bool
     total_votes: int
     has_voted: bool
     voted_option_ids: list[UUID]
@@ -36,7 +36,7 @@ class NewPollOption(IterBaseModel):
 class NewPoll(IterBaseModel):
     question: Optional[str] = None
     options: list[NewPollOption]
-    multiple_choise: bool
+    multiple_choice: bool
 
 class PollData:
     def __init__(self, question: str, options: list[str], multiple: bool = False):

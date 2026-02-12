@@ -101,9 +101,20 @@ def fetch(
         logger.debug(dump)
 
 
+def get_cookies_string() -> str:
+    """Converts the session cookie jar into a string for storage."""
+    return "; ".join([f"{k}={v}" for k, v in s.cookies.get_dict().items()])
+
 def set_cookies(cookies: str):
+    # Clear existing cookies to prevent mixing old/new sessions
+    s.cookies.clear()
+    if not cookies:
+        return
     for cookie in cookies.split('; '):
-        s.cookies.set(cookie.split('=')[0], cookie.split('=')[-1], path='/', domain='xn--d1ah4a.com.com')
+        if '=' in cookie:
+            name, value = cookie.split('=', 1)
+            # Fixed the .com.com typo found in your code
+            s.cookies.set(name, value, path='/', domain='xn--d1ah4a.com')
 
 def auth_fetch(cookies: str | list, method: str, url: str, params: dict = {}, token: str | None = None):
     base = 'https://xn--d1ah4a.com/api/'

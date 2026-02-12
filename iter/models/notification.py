@@ -1,4 +1,5 @@
 from typing import Optional, Literal
+from iter.enums import NotificationType
 from iter.models.base import IterBaseModel, PostgresDateTime
 from uuid import UUID
 
@@ -10,7 +11,7 @@ class NotificationActor(IterBaseModel):
 
 class Notification(IterBaseModel):
     id: UUID
-    type: Literal["like", "comment", "follow", "repost", "wall_post"]
+    type: NotificationType
     targetType: Optional[str] = None
     targetId: Optional[str] = None
     preview: Optional[str] = None

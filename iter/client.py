@@ -3,7 +3,9 @@ from requests import Response
 import logging, verboselogs
 from uuid import UUID
 
-from Iter.iter.routes.polls import vote
+from iter.models.user import UserPrivacyData
+from iter.request import get_cookies_string, set_cookies
+from iter.routes.polls import vote
 from iter.models.media import Attachment, PollData
 from iter.routes.pins import get_pins, remove_pin, set_pin
 logger = verboselogs.VerboseLogger(__name__)
@@ -79,9 +81,6 @@ class Client:
             and not self.cookies):
             self._manual_login()
 
-        if self.cookies:
-            self.refresh_auth()
-
         return self.token and self.cookies
 
     def _save_session(self):
@@ -101,6 +100,7 @@ class Client:
                     data = json.load(f)
                     self.token = data.get("token")
                     self.cookies = data.get("cookies")
+                    set_cookies(self.cookies)
             except Exception as e:
                 logger.warning(f"Failed to load session file: {e}")
 
@@ -123,27 +123,26 @@ class Client:
         logger.warning("Manual login failed")
 
     def refresh_auth(self):
-        """Refresh access token
-
-        Starts manual login if no cookie or if refresh token is invalid
-
-        Raises:
-            HTTPError: Refresh token expired
-
-        Returns:
-            str: Token
-        """
+        """Refresh access token and update the rotated refresh cookie"""
         if self.use_manual_login and not self.cookies:
-            self._manual_login()
+            return self._manual_login()
 
         try:
             logger.info("Refreshing access token")
-            self.token = refresh_token(self.cookies).replace('Bearer ', '')
+
+            set_cookies(self.cookies)
+
+            new_token: str = refresh_token(self.cookies)
+            self.token = new_token.replace('Bearer ', '')
+
+            self.cookies = get_cookies_string()
+
             self._save_session()
+            
             return self.token
         except HTTPError as e:
             if self.use_manual_login and e.response is not None and e.response.status_code in [401, 403]:
-                logger.info("Refresh token expired. Manual login required")
+                logger.info("Refresh token expired or revoked. Manual login required")
                 return self._manual_login()
             raise e
         
@@ -250,14 +249,14 @@ class Client:
         return res
 
     @refresh_on_error
-    def update_privacy(self, wall_closed: bool = False, private: bool = False):
+    def update_privacy(self, privacy: UserPrivacyData):
         """Update privacy settings
 
         Args:
             wall_closed (bool, optional): Close wall. Defaults to False.
             private (bool, optional): Privacy. Functionality currently unknown. Defaults to False.
         """
-        res = update_privacy(self.token, wall_closed, private)
+        res = update_privacy(self.token, privacy)
         if isinstance(res, Error):
             res.raise_for_status() # Fallback for unexpected errors
 

@@ -1,11 +1,11 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 version = '1.0.0'
 
 setup(
     name='itd-iter-api',
     version=version,
-    packages=find_packages(),
+    packages=['iter', 'iter.routes', 'iter.models'],
     install_requires=[
         'requests', 'DrissionPage', 'verboselogs'
     ],

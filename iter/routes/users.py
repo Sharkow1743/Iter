@@ -1,5 +1,5 @@
 from iter.request import fetch
-from iter.models.user import UserFull
+from iter.models.user import UserFull, UserPrivacyData
 from iter.models.responses import ProfileUpdateResponse, PrivacyUpdateResponse, FollowResponse, UserListResponse
 from iter.models.base import Error
 from uuid import UUID
@@ -20,13 +20,8 @@ def update_profile(token: str, bio: str | None = None, display_name: str | None 
         data['bannerId'] = str(banner_id)
     return fetch(token, 'put', 'users/me', data, response_schema=ProfileUpdateResponse)
 
-def update_privacy(token: str, wall_closed: bool = False, private: bool = False) -> PrivacyUpdateResponse | Error:
-    data = {}
-    if wall_closed:
-        data['wallClosed'] = wall_closed
-    if private:
-        data['isPrivate'] = private
-    return fetch(token, 'put', 'users/me/privacy', data, response_schema=PrivacyUpdateResponse)
+def update_privacy(token: str, privacy: UserPrivacyData) -> PrivacyUpdateResponse | Error:
+    return fetch(token, 'put', 'users/me/privacy', privacy.to_dict(), response_schema=PrivacyUpdateResponse)
 
 def follow(token: str, username: str) -> FollowResponse | Error:
     return fetch(token, 'post', f'users/{username}/follow', response_schema=FollowResponse)

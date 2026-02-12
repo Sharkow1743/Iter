@@ -5,7 +5,7 @@ from typing import Optional, Union, Dict, Any, Tuple
 from pydantic import BaseModel, ValidationError
 from urllib.parse import urljoin
 
-from iter.exceptions import InvalidToken, InvalidCookie, RateLimitExceeded, Unauthorized
+from iter.exceptions import AccountBanned, InvalidToken, InvalidCookie, RateLimitExceeded, Unauthorized
 from iter.models.base import Error
 
 # Use a named logger for this module
@@ -73,6 +73,8 @@ def fetch(
                         raise RateLimitExceeded(error_obj.retry_after)
                     case 'UNAUTHORIZED':
                         raise Unauthorized()
+                    case 'ACCOUNT_BANNED':
+                        raise AccountBanned()
                     case _:
                         return error_obj
                         

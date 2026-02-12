@@ -107,3 +107,13 @@ class PinNotOwned(Exception):
 class NoContent(Exception):
     def __str__(self) -> str:
         return 'Content or attachments required'
+    
+class AccountBanned(Exception):
+    def __str__(self) -> str:
+        return 'Account has been deactivated'
+    
+class NotFoundOrForbidden(Exception):
+    def __init__(self, obj: str):
+        self.obj = obj
+    def __str__(self):
+        return f'{self.obj} not found or access denied'

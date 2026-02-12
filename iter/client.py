@@ -4,6 +4,7 @@ import logging, verboselogs
 from uuid import UUID
 
 from Iter.iter.routes.polls import vote
+from iter.models.media import Attachment, PollData
 from iter.routes.pins import get_pins, remove_pin, set_pin
 logger = verboselogs.VerboseLogger(__name__)
 
@@ -22,7 +23,7 @@ from iter.routes.notifications import get_notifications, mark_all_as_read, mark_
 from iter.routes.posts import create_post, get_posts, get_post, edit_post, delete_post, pin_post, repost, restore_post, view_post, get_liked_posts, get_user_posts, like_post, unlike_post
 from iter.routes.reports import report
 from iter.routes.search import search
-from iter.routes.files import upload_file
+from iter.routes.files import delete_file, get_file, upload_file
 from iter.routes.auth import refresh_token, change_password, logout
 from iter.routes.verification import verify, get_verification_status
 
@@ -30,7 +31,7 @@ from iter.manual_auth import auth
 
 from iter.enums import PostsTab, ReportTargetType, ReportTargetReason
 from iter.exceptions import (
-    NoCookie, NoAuthData, SamePassword, InvalidOldPassword, NotFound, ValidationError, UserBanned,
+    NoCookie, NoAuthData, NotFoundOrForbidden, SamePassword, InvalidOldPassword, NotFound, ValidationError, UserBanned,
     PendingRequestExists, Forbidden, UsernameTaken, CantFollowYourself, Unauthorized,
     CantRepostYourPost, AlreadyReposted, AlreadyReported, TooLarge, PinNotOwned, InvalidToken,
     InvalidRefreshToken, NoContent
@@ -595,7 +596,7 @@ class Client:
         return res
 
     @refresh_on_error
-    def create_post(self, content: str, wall_recipient_id: UUID | None = None, attach_ids: list[UUID] = []):
+    def create_post(self, content: str, wall_recipient_id: UUID | None = None, attach_ids: list[UUID] = [], poll: PollData | None = None):
         """Create post
 
         Args:
@@ -607,7 +608,7 @@ class Client:
             NotFound: User not found
             ValidationError: Validation error
         """
-        res = create_post(self.token, content, wall_recipient_id, attach_ids)
+        res = create_post(self.token, content, wall_recipient_id, attach_ids, poll.poll if poll else None)
         if isinstance(res, Error):
             match res.code:
                 case 'NOT_FOUND':
@@ -968,3 +969,42 @@ class Client:
         """
 
         return vote(self.token, ids)
+    
+    @refresh_on_error
+    def get_file(self, id: UUID) -> Attachment:
+        """Получить файл
+
+        Args:
+            id (UUID): UUID файла
+
+        Raises:
+            NotFoundOrForbidden: Файл не найден или нет доступа
+
+        Returns:
+            File: Файл
+        """
+        res = get_file(self.token, id)
+        if isinstance(res, Error):
+            match res.code:
+                case 'NOT_FOUND':
+                    raise NotFoundOrForbidden('File')
+
+        return res
+
+    @refresh_on_error
+    def delete_file(self, id: UUID) -> Attachment:
+        """Удалить файл
+
+        Args:
+            id (UUID): UUID файла
+
+        Raises:
+            NotFound: Файл не найден
+        """
+        res = delete_file(self.token, id)
+        if isinstance(res, Error):
+            match res.code:
+                case 'NOT_FOUND':
+                    raise NotFound('File')
+
+        return res

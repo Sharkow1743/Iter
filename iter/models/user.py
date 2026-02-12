@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Optional
 from uuid import UUID
+from iter.enums import AccessType
 from iter.models.base import IterBaseModel, PostgresDateTime
 from iter.models.pin import ShortPin
 
@@ -30,3 +31,23 @@ class UserFull(User):
 class Clan(IterBaseModel):
     avatar: str
     member_count: int
+
+class UserPrivacyData:
+    def __init__(self, private: bool | None = None, wall_access: AccessType | None = None, likes_visibility: AccessType | None = None, show_last_seen: bool | None = None) -> None:
+        self.private = private
+        self.wall_access = wall_access
+        self.likes_visibility = likes_visibility
+        self.show_last_seen = show_last_seen
+
+    def to_dict(self):
+        data = {}
+        if self.private is not None:
+            data['isPrivate'] = self.private
+        if self.wall_access is not None:
+            data['wallAccess'] = self.wall_access.value
+        if self.likes_visibility is not None:
+            data['likesVisibility'] = self.likes_visibility.value
+        if self.show_last_seen is not None:
+            data['showLastSeen'] = self.show_last_seen
+
+        return data

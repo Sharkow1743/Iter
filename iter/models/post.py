@@ -30,6 +30,7 @@ class Post(IterBaseModel):
     is_reposted: bool = False
     is_owner: bool = False
     is_viewed: bool = False
+    is_pinned: bool =False
     wall_recipient_id: Optional[str] = None
     wall_recipient: Optional[User] = None
     original_post: Optional[Post] = None

@@ -1,3 +1,4 @@
+from iter.enums import AccessType
 from iter.models.pin import Pin, ShortPin
 from iter.models.user import User, Clan
 from iter.models.etc import Hashtag, CursorPagination, PagePagination
@@ -61,7 +62,8 @@ class ProfileUpdateResponse(IterBaseModel):
 
 class PrivacyUpdateResponse(IterBaseModel):
     is_private: bool
-    wall_closed: bool
+    wall_access: AccessType = AccessType.EVERYONE
+    likes_visibility: AccessType = AccessType.EVERYONE
 
 class NotificationListResponse(IterBaseModel):
     notifications: List[Notification]

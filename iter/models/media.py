@@ -1,10 +1,11 @@
 from typing import Optional
 from iter.models.base import IterBaseModel, PostgresDateTime
 from uuid import UUID
+from iter.enums import AttachType
 
 class Attachment(IterBaseModel):
     id: UUID
-    type: Optional[str] = None  # "image" or "video"
+    type: Optional[AttachType] = None
     url: str
     thumbnailUrl: Optional[str] = None
     width: Optional[int] = None
@@ -12,6 +13,7 @@ class Attachment(IterBaseModel):
     filename: Optional[str] = None
     mimeType: Optional[str] = None
     size: Optional[int] = None
+    created_at: Optional[PostgresDateTime] = None
 
 class PollOption(IterBaseModel):
     id: UUID
@@ -35,3 +37,7 @@ class NewPoll(IterBaseModel):
     question: Optional[str] = None
     options: list[NewPollOption]
     multiple_choise: bool
+
+class PollData:
+    def __init__(self, question: str, options: list[str], multiple: bool = False):
+        self.poll = NewPoll(question=question, options=[NewPollOption(text=option) for option in options], multipleChoice=multiple)

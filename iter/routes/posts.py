@@ -14,7 +14,7 @@ def create_post(token: str, content: str, wall_recipient_id: UUID | None = None,
     if attachment_ids:
         data['attachmentIds'] = list(map(str, attachment_ids))
     if poll:
-        data['poll'] = NewPoll.model_dump_json(poll)
+        data['poll'] = NewPoll.model_dump(poll)
 
     return fetch(token, 'post', 'posts', data, response_schema=Post)
 

@@ -1,3 +1,7 @@
+from typing import Optional
+from uuid import UUID
+
+
 class NoCookie(Exception):
     def __str__(self):
         return 'No cookie for refresh-token required action'
@@ -117,3 +121,10 @@ class NotFoundOrForbidden(Exception):
         self.obj = obj
     def __str__(self):
         return f'{self.obj} not found or access denied'
+    
+class NotVerified(Exception):
+    def __init__(self, user_id: Optional[UUID | str] = None):
+        self.user_id = str(user_id)
+    def __str__(self):
+        verificate_link = 'https://t.me/itd_verification_bot?start=' + self.user_id
+        return f'Phone number verification required{": " + verificate_link if self.user_id else ""}'

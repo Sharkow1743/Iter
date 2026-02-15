@@ -1,6 +1,5 @@
-import logging, verboselogs
-from _io import BufferedReader
-from requests import Session, Response, PreparedRequest, Request, JSONDecodeError
+import verboselogs
+from requests import RequestException, Session, Response, PreparedRequest, Request, JSONDecodeError
 from typing import Optional, Union, Dict, Any, Tuple
 from pydantic import BaseModel, ValidationError
 from urllib.parse import urljoin
@@ -91,7 +90,14 @@ def fetch(
                 raise e
 
         return response
-
+    
+    except RequestException as e:
+        error_obj = Error(
+            code="REQUEST_FAILED",
+            message=str(e)
+        )
+        logger.error(f"Network error: {str(e)}")
+        return error_obj
     except Exception as e:
         logger.error(f"Request failed: {str(e)}")
         raise

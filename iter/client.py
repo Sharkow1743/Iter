@@ -36,7 +36,7 @@ from iter.exceptions import (
     NoCookie, NoAuthData, NotFoundOrForbidden, SamePassword, InvalidOldPassword, NotFound, ValidationError, UserBanned,
     PendingRequestExists, Forbidden, UsernameTaken, CantFollowYourself, Unauthorized,
     CantRepostYourPost, AlreadyReposted, AlreadyReported, TooLarge, PinNotOwned, InvalidToken,
-    InvalidRefreshToken, NoContent
+    InvalidRefreshToken, NoContent, NotVerified
 )
 
 from iter.models.base import Error
@@ -69,6 +69,9 @@ class Client:
         is_auth = self.auth()
         if not is_auth:
             raise NoAuthData
+        
+        me = self.get_me()
+        self.me = None if isinstance(me, Error) else me
 
     def auth(self):
         if (self.session_file 
@@ -245,6 +248,8 @@ class Client:
                          raise ValidationError(*list(res.data['found'].items())[0])
                 case 'USERNAME_TAKEN':
                     raise UsernameTaken()
+                case 'PHONE_VERIFICATION_REQUIRED':
+                    raise NotVerified(self.me.id if self.me else None)
         
         return res
 
@@ -413,6 +418,8 @@ class Client:
                 case 'VALIDATION_ERROR':
                     if hasattr(res, 'data') and 'found' in res.data:
                          raise ValidationError(*list(res.data['found'].items())[0])
+                case 'PHONE_VERIFICATION_REQUIRED':
+                    raise NotVerified(self.me.id if self.me else None)
 
         return res
 
@@ -440,8 +447,10 @@ class Client:
                     if hasattr(res, 'data') and 'found' in res.data:
                          raise ValidationError(*list(res.data['found'].items())[0])
                     raise NoContent()
-                case 'FAILED_QUERY': # Assuming code for 500 error
+                case 'FAILED_QUERY':
                     raise NotFound('User')
+                case 'PHONE_VERIFICATION_REQUIRED':
+                    raise NotVerified(self.me.id if self.me else None)
         
         return res
 
@@ -615,6 +624,8 @@ class Client:
                 case 'VALIDATION_ERROR':
                     if hasattr(res, 'data') and 'found' in res.data:
                          raise ValidationError(*list(res.data['found'].items())[0])
+                case 'PHONE_VERIFICATION_REQUIRED':
+                    raise NotVerified(self.me.id if self.me else None)
         
         return res
 
@@ -738,6 +749,8 @@ class Client:
                         raise CantRepostYourPost()
                     if hasattr(res, 'data') and 'found' in res.data:
                          raise ValidationError(*list(res.data['found'].items())[0])
+                case 'PHONE_VERIFICATION_REQUIRED':
+                    raise NotVerified(self.me.id if self.me else None)
 
         return res
 

@@ -1,7 +1,11 @@
 from __future__ import annotations
 from typing import List, Optional
 from uuid import UUID
+
+from pydantic import computed_field
+from iter.enums import SpanType
 from iter.models.base import IterBaseModel, PostgresDateTime
+from iter.models.span import Span
 from iter.models.user import User
 from iter.models.media import Attachment, Poll
 
@@ -21,6 +25,7 @@ class Post(IterBaseModel):
     content: str
     author: User
     attachments: List[Attachment] = []
+    spans: List[Span]
     likes_count: int = 0
     comments_count: int = 0
     reposts_count: int = 0

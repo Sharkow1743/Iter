@@ -40,3 +40,12 @@ class AccessType(Enum):
     MUTUAL = 'mutual' # взаимные
     FOLLOWERS = 'followers' # подписчики
     EVERYONE = 'everyone' # все
+
+class SpanType(Enum):
+    HASHTAG = 'hashtag'
+    MONOSPACE = 'monospace'
+    STRIKETHROUGH = 'strike'
+    UNDERLINE = 'underline'
+    BOLD = 'bold'
+    ITALIC = 'italic'
+    SPOILER = 'spoiler'

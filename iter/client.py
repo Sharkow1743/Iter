@@ -3,6 +3,7 @@ from requests import Response
 import logging, verboselogs
 from uuid import UUID
 
+from iter import md
 from iter.models.user import UserPrivacyData
 from iter.request import get_cookies_string, set_cookies
 from iter.routes.polls import vote
@@ -604,7 +605,7 @@ class Client:
         return res
 
     @refresh_on_error
-    def create_post(self, content: str, wall_recipient_id: UUID | None = None, attach_ids: list[UUID] = [], poll: PollData | None = None):
+    def create_post(self, content: str, wall_recipient_id: UUID | None = None, attach_ids: list[UUID] = [], poll: PollData | None = None, parse_md: bool = True):
         """Create post
 
         Args:
@@ -616,7 +617,12 @@ class Client:
             NotFound: User not found
             ValidationError: Validation error
         """
-        res = create_post(self.token, content, wall_recipient_id, attach_ids, poll.poll if poll else None)
+
+        formated = None
+        if parse_md:
+            formated, content = md.parse_markdown(content)
+
+        res = create_post(self.token, content, wall_recipient_id, attach_ids, formated, poll.poll if poll else None)
         if isinstance(res, Error):
             match res.code:
                 case 'NOT_FOUND':

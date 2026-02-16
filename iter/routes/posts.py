@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import List
+from iter.models.span import Span
 from iter.request import fetch
 from iter.models.post import Post
 from iter.models.responses import PostFeedResponse, Post, PostUpdateResponse, PinResponse
@@ -7,7 +9,7 @@ from requests import Response
 from iter.models.base import Error
 from uuid import UUID
 
-def create_post(token: str, content: str, wall_recipient_id: UUID | None = None, attachment_ids: list[str] = [], poll: NewPoll | None = None) -> Post | Error:
+def create_post(token: str, content: str, wall_recipient_id: UUID | None = None, attachment_ids: list[str] = [], format: List[Span] | None = None, poll: NewPoll | None = None) -> Post | Error:
     data: dict = {'content': content}
     if wall_recipient_id:
         data['wallRecipientId'] = str(wall_recipient_id)
@@ -15,6 +17,8 @@ def create_post(token: str, content: str, wall_recipient_id: UUID | None = None,
         data['attachmentIds'] = list(map(str, attachment_ids))
     if poll:
         data['poll'] = NewPoll.model_dump(poll)
+    if format:
+        data['spans'] = [Span.model_dump(span) for span in format]
 
     return fetch(token, 'post', 'posts', data, response_schema=Post)
 

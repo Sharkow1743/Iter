@@ -114,11 +114,11 @@ def auth(email = None, password = None):
         logger.info(f"Attempting to autofill login for: {email}")
 
         if email:
-            email_field = page.ele('#login-email')
+            email_field = page.ele('.snRcI1jZ ')
             email_field.input(email)
 
         if password:
-            pass_field = page.ele('#login-password')
+            pass_field = page.ele('.snRcI1jZ')
             pass_field.input(password)
 
         logger.info("Waiting for authentication response")

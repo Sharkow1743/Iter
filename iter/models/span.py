@@ -6,4 +6,4 @@ class Span(IterBaseModel):
     type: SpanType
     length: int
     offset: int
-    tag: Optional[str] = None
+    url: Optional[str] = None

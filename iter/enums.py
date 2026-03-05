@@ -49,3 +49,6 @@ class SpanType(Enum):
     BOLD = 'bold'
     ITALIC = 'italic'
     SPOILER = 'spoiler'
+    MENTION = 'mention'
+    LINK = 'link'
+    QUOTE = 'quote'

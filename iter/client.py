@@ -398,7 +398,7 @@ class Client:
         return res
 
     @refresh_on_error
-    def add_comment(self, post_id: UUID, content: str, attachment_ids: list[UUID] = []):
+    def add_comment(self, post_id: UUID, content: str, attachment_ids: list[UUID] = [], parse_md: bool = True):
         """Add comment
 
         Args:
@@ -411,7 +411,11 @@ class Client:
             ValidationError: Validation error
             NotFound: Post not found
         """
-        res = add_comment(self.token, post_id, content, attachment_ids)
+        formated = None
+        if parse_md:
+            formated, content = md.parse_markdown(content)
+
+        res = add_comment(self.token, post_id, content, attachment_ids, formated)
         if isinstance(res, Error):
             match res.code:
                 case 'NOT_FOUND':
@@ -425,7 +429,7 @@ class Client:
         return res
 
     @refresh_on_error
-    def add_reply_comment(self, comment_id: UUID, content: str, author_id: UUID | None = None, attachment_ids: list[UUID] = []):
+    def add_reply_comment(self, comment_id: UUID, content: str, author_id: UUID | None = None, attachment_ids: list[UUID] = [], parse_md: bool = True):
         """Add reply comment
 
         Args:
@@ -439,7 +443,11 @@ class Client:
             NotFound: User or Comment not found
             NoContent: Validation error resulting in no content
         """
-        res = add_reply_comment(self.token, comment_id, content, author_id, attachment_ids)
+        formated = None
+        if parse_md:
+            formated, content = md.parse_markdown(content)
+
+        res = add_reply_comment(self.token, comment_id, content, author_id, attachment_ids, formated)
         if isinstance(res, Error):
             match res.code:
                 case 'NOT_FOUND':

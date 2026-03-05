@@ -41,6 +41,7 @@ class Post(IterBaseModel):
     original_post: Optional[Post] = None
     comments: Optional[List[Comment]] = None
     poll: Optional[Poll] = None
+    dominant_emoji: Optional[str] = None
 
 Post.model_rebuild()
 Comment.model_rebuild()

@@ -18,7 +18,7 @@ def create_post(token: str, content: str, wall_recipient_id: UUID | None = None,
     if poll:
         data['poll'] = NewPoll.model_dump(poll)
     if format:
-        data['spans'] = [Span.model_dump(span) for span in format]
+        data['spans'] = [span.model_dump(mode='json') for span in format]
 
     return fetch(token, 'post', 'posts', data, response_schema=Post)
 

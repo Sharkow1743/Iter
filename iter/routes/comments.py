@@ -12,7 +12,7 @@ def add_comment(token: str, post_id: UUID, content: str, attachment_ids: Optiona
     if attachment_ids:
         data['attachmentIds'] = attachment_ids
     if format:
-        data['spans'] = [Span.model_dump(span) for span in format]
+        data['spans'] = [span.model_dump(mode='json') for span in format]
     return fetch(token, 'post', f'posts/{post_id}/comments', data, response_schema=Comment)
 
 def add_reply_comment(token: str, comment_id: UUID, content: str, author_id: UUID | None = None, attachment_ids: Optional[list[str]] = None, format: List[Span] | None = None) -> Comment | Error:
@@ -22,7 +22,7 @@ def add_reply_comment(token: str, comment_id: UUID, content: str, author_id: UUI
     if author_id:
         data['replyToUserId'] = author_id
     if format:
-        data['spans'] = [Span.model_dump(span) for span in format]
+        data['spans'] = [span.model_dump(mode='json') for span in format]
     return fetch(token, 'post', f'comments/{comment_id}/replies', data, response_schema=Comment)
 
 def get_comments(token: str, post_id: UUID, limit: int = 20, cursor: int = 0, sort: str = 'popular') -> CommentsResponse | Error:

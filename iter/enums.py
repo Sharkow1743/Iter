@@ -42,13 +42,13 @@ class AccessType(Enum):
     EVERYONE = 'everyone' # все
 
 class SpanType(Enum):
-    HASHTAG = 'hashtag' # Not used in creating post
+    HASHTAG = 'hashtag' # Not used in creating post or comment
     MONOSPACE = 'monospace'
     STRIKETHROUGH = 'strike'
     UNDERLINE = 'underline'
     BOLD = 'bold'
     ITALIC = 'italic'
     SPOILER = 'spoiler'
-    MENTION = 'mention' # Not used in creating post (?)
+    MENTION = 'mention' # Not used in creating post or comment
     LINK = 'link'
-    QUOTE = 'quote'
+    QUOTE = 'quote' # Not available for now

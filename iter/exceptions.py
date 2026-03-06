@@ -128,3 +128,37 @@ class NotVerified(Exception):
     def __str__(self):
         verificate_link = 'https://t.me/itd_verification_bot?start=' + self.user_id
         return f'Phone number verification required{": " + verificate_link if self.user_id else ""}'
+    
+class AlreadyFollowing(Exception):
+    def __str__(self) -> str:
+        return 'Already following user'
+    
+class OptionsNotBelong(Exception):
+    def __str__(self) -> str:
+        return 'One or more options do not belong to poll'
+    
+class NotMultipleChoice(Exception):
+    def __str__(self) -> str:
+        return 'Only one option can be choosen in this poll'
+
+class EmptyOptions(Exception):
+    def __str__(self) -> str:
+        return 'Options cannot be empty (pre-validation)'
+
+class ProfileRequired(Exception):
+    def __str__(self) -> str:
+        return 'No profile. Please create your profile first'
+
+class RequiresVerification(Exception):
+    def __init__(self, subject: str):
+        self.subject = subject
+    def __str__(self) -> str:
+        return f'{self.subject.title()} uploading allowed only for verificated users'
+
+class InvalidFileType(Exception):
+    def __str__(self) -> str:
+        return 'Invalid file extension'
+
+class EditExpired(Exception):
+    def __str__(self) -> str:
+        return 'Editing allowed only in first 48 hours after posting'

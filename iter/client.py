@@ -9,6 +9,7 @@ from iter.request import get_cookies_string, set_cookies
 from iter.routes.polls import vote
 from iter.models.media import Attachment, PollData
 from iter.routes.pins import get_pins, remove_pin, set_pin
+
 logger = verboselogs.VerboseLogger(__name__)
 
 import json
@@ -34,12 +35,12 @@ from iter.manual_auth import auth
 
 from iter.enums import PostsTab, ReportTargetType, ReportTargetReason
 from iter.exceptions import (
-    NoCookie, NoAuthData, NotFoundOrForbidden, SamePassword, InvalidOldPassword, NotFound, ValidationError, UserBanned,
+    NoCookie, NoAuthData, SamePassword, InvalidOldPassword, NotFound, ValidationError, UserBanned,
     PendingRequestExists, Forbidden, UsernameTaken, CantFollowYourself, Unauthorized,
-    CantRepostYourPost, AlreadyReposted, AlreadyReported, TooLarge, PinNotOwned, InvalidToken,
-    InvalidRefreshToken, NoContent, NotVerified
+    CantRepostYourPost, AlreadyReposted, AlreadyReported, TooLarge, PinNotOwned, NoContent,
+    AlreadyFollowing, NotFoundOrForbidden, OptionsNotBelong, NotMultipleChoice, EmptyOptions,
+    RequiresVerification, InvalidFileType, EditExpired, NotVerified
 )
-
 from iter.models.base import Error
 
 def refresh_on_error(func):
@@ -152,13 +153,13 @@ class Client:
         
     @refresh_on_error
     def logout(self) -> dict:
-        """Выход из аккаунта
+        """Logout from account
 
         Raises:
-            NoCookie: Нет cookie
+            NoCookie: No cookies
 
         Returns:
-            dict: Ответ API
+            dict: API response
         """
         if not self.cookies:
             raise NoCookie()
@@ -239,18 +240,23 @@ class Client:
         Raises:
             ValidationError: Validation error
             UsernameTaken: Username is already taken
+            InvalidFileType: Banner cannot be animated
         """
         res = update_profile(self.token, bio, display_name, username, banner_id)
         if isinstance(res, Error):
             match res.code:
                 case 'VALIDATION_ERROR':
-                    # Assuming res.data contains the validation details
                     if hasattr(res, 'data') and 'found' in res.data:
                          raise ValidationError(*list(res.data['found'].items())[0])
                 case 'USERNAME_TAKEN':
                     raise UsernameTaken()
                 case 'PHONE_VERIFICATION_REQUIRED':
                     raise NotVerified(self.me.id if self.me else None)
+                case 'GIF_REQUIRES_VERIFICATION':
+                    raise RequiresVerification('GIF banner')
+            if res.message == 'Баннер может быть только изображением':
+                raise InvalidFileType()
+                
         
         return res
 
@@ -259,12 +265,9 @@ class Client:
         """Update privacy settings
 
         Args:
-            wall_closed (bool, optional): Close wall. Defaults to False.
-            private (bool, optional): Privacy. Functionality currently unknown. Defaults to False.
+            privacy (UserPrivacyData): Privacy data
         """
         res = update_privacy(self.token, privacy)
-        if isinstance(res, Error):
-            res.raise_for_status() # Fallback for unexpected errors
 
         return res
 
@@ -406,10 +409,12 @@ class Client:
             content (str): Content
             attachment_ids (list[UUID]): List of attached file UUIDs
             reply_comment_id (UUID | None, optional): Reply comment ID. Defaults to None.
+            parse_md (bool, optional): Parse md in content
 
         Raises:
             ValidationError: Validation error
             NotFound: Post not found
+            NotVerified: Phone authorrizatioon required
         """
         formated = None
         if parse_md:
@@ -442,6 +447,7 @@ class Client:
             ValidationError: Validation error
             NotFound: User or Comment not found
             NoContent: Validation error resulting in no content
+            NotVerified: Phone authorrizatioon required
         """
         formated = None
         if parse_md:
@@ -624,6 +630,8 @@ class Client:
         Raises:
             NotFound: User not found
             ValidationError: Validation error
+            RequiresVerification: You need verification to use video
+            Forbidden: You don`t own some files
         """
 
         formated = None
@@ -640,6 +648,11 @@ class Client:
                          raise ValidationError(*list(res.data['found'].items())[0])
                 case 'PHONE_VERIFICATION_REQUIRED':
                     raise NotVerified(self.me.id if self.me else None)
+                case 'VIDEO_REQUIRES_VERIFICATION':
+                    raise RequiresVerification('Video')
+                
+            if res.message == 'Некоторые файлы не принадлежат вам':
+                raise Forbidden('post - some files not owned')
         
         return res
 
@@ -992,9 +1005,28 @@ class Client:
 
         Args:
             ids (list[UUID]): UUIDs of options in poll
+
+        Raises:
+            EmptyOptions: Пустые варианты
+            NotFound: Пост не найден или в посте нет опроса
+            OptionsNotBelong: Неверные варианты (варинты не пренадлежат опросу)
+            NotMultipleChoice: Можно выбрать только 1 вариант (для опросов, где не разрешены несколько ответов)
         """
 
-        return vote(self.token, ids)
+        res = vote(self.token, ids)
+        if isinstance(res, Error):
+            match (res.code, res.message):
+                case ('NOT_FOUND', 'Один или несколько вариантов не принадлежат этому опросу'):
+                    raise NotFound('Poll')
+                case ('NOT_FOUND', _):
+                    raise NotFound('Post')
+                case ('VALIDATION_ERROR', 'Один или несколько вариантов не принадлежат этому опросу'):
+                    raise OptionsNotBelong()
+                case ('VALIDATION_ERROR', 'В этом опросе можно выбрать только один вариант'):
+                    raise NotMultipleChoice()
+
+
+        return res
     
     @refresh_on_error
     def get_file(self, id: UUID) -> Attachment:
